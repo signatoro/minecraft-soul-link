@@ -1,4 +1,5 @@
 
-current_world/
-current_world/world
-old_worlds/
+/current_world/*
+/old_worlds/*
+
+
