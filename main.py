@@ -98,14 +98,23 @@ class SoulLink():
     def check_all_player_dead(self) -> bool:
         print ("Checking if a player has died")
 
-        response = requests.get(SERVER_URL, '/player/deaths')
-        data = response.json()
+        logs = subprocess.check_output(['docker', 'logs', 'minecraft-server']).decode('utf-8')
 
-        for player_data in data:
-            print(player_data)
-            if player_data.get('death_count', 0) > 1:
-                    print("A Player has died")
-                    return True
+        if 'SoulLinkPlayerDied' in logs:
+            print("Player has died!")
+            return True
+            # Add your logic here to handle the event
+
+        # Wait for a short interval before checking again
+
+        # response = requests.get(SERVER_URL, '/player/deaths')
+        # data = response.json()
+
+        # for player_data in data:
+        #     print(player_data)
+        #     if player_data.get('death_count', 0) > 1:
+        #             print("A Player has died")
+        #             return True
 
         return False
 
