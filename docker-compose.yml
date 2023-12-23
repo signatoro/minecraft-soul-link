@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  minecraft-server:
+    image: itzg/minecraft-server
+    environment:
+      - EULA=TRUE
+      - DIFFICULTY=3
+      - HARDCORE=TRUE  
+      - JAVA_OPTS=-Xms2G -Xmx6G
+    ports:
+      - "25565:25565"
+    volumes:
+      - /Users/couchcomfy/Code/personal/minecraft-soul-link/current_world/world:/data/world
+    networks:
+      - minecraft-net
+
+networks:
+  minecraft-net:
+    driver: bridge
