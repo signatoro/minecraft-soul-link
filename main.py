@@ -29,7 +29,6 @@ class SoulLink():
 
             if self.check_all_player_dead():
                 self.stop_server()
-                time.sleep(15)
                 self.move_world()
 
                 self.start_server()
@@ -98,9 +97,9 @@ class SoulLink():
     def check_all_player_dead(self) -> bool:
         print ("Checking if a player has died")
 
-        logs = subprocess.check_output(['docker', 'logs', 'minecraft-server']).decode('utf-8')
+        logs = subprocess.check_output(['docker', 'logs', 'minecraft-soul-link_minecraft-server_1']).decode('utf-8')
 
-        if 'SoulLinkPlayerDied' in logs:
+        if 'died' in logs:
             print("Player has died!")
             return True
             # Add your logic here to handle the event
