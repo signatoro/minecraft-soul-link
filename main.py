@@ -9,8 +9,6 @@ import subprocess
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-SERVER_URL = 'http://10.0.0.117:9002'
-
 class SoulLink():
     running = True
 
@@ -24,8 +22,6 @@ class SoulLink():
         self.start_server()
 
         while self.running:
-
-            
 
             if self.check_all_player_dead():
                 self.stop_server()
@@ -63,22 +59,20 @@ class SoulLink():
             print("Finished start up")
 
             # Check if world has been created
-            print("Starting World Creation Wait")
+            print("Adding Data Pack")
             if os.path.exists("current_world/world"):
                 while not os.path.exists("current_world/world/datapacks/SoulLink"):
-                    print ("Waiting...")
                     if (os.path.exists("current_world/world/datapacks")):
                         shutil.copytree("SoulLink", "current_world/world/datapacks/SoulLink")
                         break
+                    print ("Waiting...")
                     time.sleep(35)
 
-            time.sleep(35)
-            print("Loading data pack")
+            # time.sleep(35)
+            print("Loading Data Pack")
             # docker exec -it minecraft-soul-link_minecraft-server_1 rcon-cli --password 1234ss 'say 1'
             subprocess.run(['docker', 'exec', '-it', 'minecraft-soul-link_minecraft-server_1', 'rcon-cli', '--password', '1234ss', '/reload'])
             
-
-
 
             # Check if the datapack is in the game. 
         else:
@@ -88,7 +82,7 @@ class SoulLink():
         if self.server_running:
             self.server_running = False
             subprocess.run(['docker-compose', 'down'])
-            time.sleep(30)
+            time.sleep(10)
             print("Server Fully Stopped")
         else:
             logging.debug("Server is already shutdown")
@@ -106,21 +100,9 @@ class SoulLink():
 
         logs = subprocess.check_output(['docker', 'logs', 'minecraft-soul-link_minecraft-server_1']).decode('utf-8')
 
-        if 'died' in logs:
+        if 'All Souls Have Been Severed.' in logs:
             print("Player has died!")
             return True
-            # Add your logic here to handle the event
-
-        # Wait for a short interval before checking again
-
-        # response = requests.get(SERVER_URL, '/player/deaths')
-        # data = response.json()
-
-        # for player_data in data:
-        #     print(player_data)
-        #     if player_data.get('death_count', 0) > 1:
-        #             print("A Player has died")
-        #             return True
 
         return False
 
