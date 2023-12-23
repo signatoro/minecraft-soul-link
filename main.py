@@ -9,7 +9,7 @@ import subprocess
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-SERVER_URL = '10.0.0.117:25565'
+SERVER_URL = 'http://10.0.0.117:9002'
 
 class SoulLink():
     running = True
@@ -19,20 +19,22 @@ class SoulLink():
     server_running = False
 
     def start_program(self):
+        self.server_running = False
 
         self.start_server()
 
         while self.running:
 
-            time.sleep(25)
+            
 
             if self.check_all_player_dead():
                 self.stop_server()
                 time.sleep(15)
                 self.move_world()
 
-                pass
+                self.start_server()
 
+            time.sleep(25)
         # Check if world exists start docker
         # If world doesn't exist start docker add datapack
         
@@ -49,24 +51,30 @@ class SoulLink():
 
 
     def start_server(self):
+        print("Creating the server")
         if not self.server_running:
+            
+            if not os.path.exists("current_world/world"):
+                os.mkdir("current_world/world")
+
             self.server_running = True
             subprocess.run(['docker-compose', 'up', '-d'])
-            time.sleep(15)
+            
+            time.sleep(50)
+            print("Finished start up")
 
             # Check if world has been created
-
+            print("Starting World Creation Wait")
             if os.path.exists("current_world/world"):
-                while not os.path.exists("current_world/world/datapack/SoulLink"):
-                    if (os.path.exists("current_world/world/datapack")):
-                        shutil.copytree("SoulLink", "current_world/world/datapack")
+                while not os.path.exists("current_world/world/datapacks/SoulLink"):
+                    print ("Waiting...")
+                    if (os.path.exists("current_world/world/datapacks")):
+                        shutil.copytree("SoulLink", "current_world/world/datapacks/SoulLink")
+                        break
                     time.sleep(35)
 
 
             # Check if the datapack is in the game. 
-
-
-            time.sleep(90)
         else:
             logging.debug("Server is already running")
 
@@ -74,6 +82,8 @@ class SoulLink():
         if self.server_running:
             self.server_running = False
             subprocess.run(['docker-compose', 'down'])
+            time.sleep(30)
+            print("Server Fully Stopped")
         else:
             logging.debug("Server is already shutdown")
 
@@ -85,7 +95,8 @@ class SoulLink():
         
         
 
-    def check_all_player_dead() -> bool:
+    def check_all_player_dead(self) -> bool:
+        print ("Checking if a player has died")
 
         response = requests.get(SERVER_URL, '/player/deaths')
         data = response.json()
@@ -93,6 +104,7 @@ class SoulLink():
         for player_data in data:
             print(player_data)
             if player_data.get('death_count', 0) > 1:
+                    print("A Player has died")
                     return True
 
         return False
