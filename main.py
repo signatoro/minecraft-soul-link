@@ -72,6 +72,11 @@ class SoulLink():
                         break
                     time.sleep(35)
 
+            time.sleep(35)
+            print("Loading data pack")
+            
+
+
 
             # Check if the datapack is in the game. 
         else:

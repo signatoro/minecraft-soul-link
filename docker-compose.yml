@@ -8,8 +8,11 @@ services:
       - DIFFICULTY=3
       - HARDCORE=TRUE  
       - JAVA_OPTS=-Xms2G -Xmx6G
+      - ENABLE_RCON=true
+      - RCON_PASSWORD=1234ss
     ports:
       - "9002:25565"
+      - "25575:25575"
     volumes:
       - /home/couchcomfy/code/personal/minecraft-soul-link/current_world/world:/data/world
     networks:
