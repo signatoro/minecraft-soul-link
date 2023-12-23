@@ -74,6 +74,8 @@ class SoulLink():
 
             time.sleep(35)
             print("Loading data pack")
+            # docker exec -it minecraft-soul-link_minecraft-server_1 rcon-cli --password 1234ss 'say 1'
+            subprocess.run(['docker', 'exec', '-it', 'minecraft-soul-link_minecraft-server_1', 'rcon-cli', '--password', '1234ss', '/reload'])
             
 
 

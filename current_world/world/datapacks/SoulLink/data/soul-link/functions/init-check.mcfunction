@@ -1,1 +1,0 @@
-execute unless entity @e[type=minecraft:armor_stand,x=-1,dx=2,y=-65,dy=2,z=-1,dz=2,tag=SOUL-LINK] run function soul-link:init
