@@ -1,10 +1,11 @@
 import os
-import sys
 import time
 import shutil
 import logging
-import requests
 import subprocess
+
+from mcrcon import MCRcon
+
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -16,30 +17,23 @@ class SoulLink():
 
     server_running = False
 
-    def start_program(self):
-        self.server_running = False
+    def start_program(self):   
 
-        self.start_server()
+        self.send_command('/execute if entity @a[tag=playerWhoDied] run tag @p[tag=playerWhoDied] list')
 
-        while self.running:
+        # self.server_running = False
 
-            if self.check_all_player_dead():
-                self.stop_server()
-                self.move_world()
+        # self.start_server()
 
-                self.start_server()
+        # while self.running:
 
-            time.sleep(25)
-        # Check if world exists start docker
-        # If world doesn't exist start docker add datapack
-        
-        # Check if player is dead
+        #     if self.check_all_player_dead():
+        #         self.stop_server()
+        #         self.move_world()
 
-        # If player is dead. stop the docker container. move the world. Add data to csv 
-        # Start the docker container.
-            
+        #         self.start_server()
 
-            
+        #     time.sleep(25)
 
         return 0
 
@@ -80,9 +74,29 @@ class SoulLink():
 
     def stop_server(self):
         if self.server_running:
-            self.server_running = False
+
+            self.send_command("say !! The world will be reset in 45 seconds !!")
+
+            time.sleep(35)
+
+            self.send_command("say !! The server will reset 10 seconds !!")
+
+            time.sleep(5)
+
+            self.send_command("say !! The server will reset 5 seconds !!")
+
+            time.sleep(5)
+            
+            self.send_command("say !! The server is being shut down!!") 
+            self.send_command("It will restart in a few minutes !!")
+
+            time.sleep(3)
+            
+            print("Server shutdown beginning")
+
             subprocess.run(['docker-compose', 'down'])
-            time.sleep(10)
+            time.sleep(6)
+            self.server_running = False
             print("Server Fully Stopped")
         else:
             logging.debug("Server is already shutdown")
@@ -98,14 +112,33 @@ class SoulLink():
     def check_all_player_dead(self) -> bool:
         print ("Checking if a player has died")
 
-        logs = subprocess.check_output(['docker', 'logs', 'minecraft-soul-link_minecraft-server_1']).decode('utf-8')
-
-        if 'All Souls Have Been Severed.' in logs:
-            print("Player has died!")
+        response = self.send_command('/execute if entity @a[tag=playerWhoDied] run tag @p[tag=playerWhoDied] list')
+        
+        if response:
+            rep_break = response.split(' ')
+            print(f"{rep_break.pop(0)} has died!")
             return True
+        # logs = subprocess.check_output(['docker', 'logs', 'minecraft-soul-link_minecraft-server_1']).decode('utf-8')
+
+        # if 'All Souls Have Been Severed.' in logs:
+        #     print("Player has died!")
+        #     return True
 
         return False
+    
+    def send_command(self, command):
+        response = ''
+        try:
+            # Replace 'your_rcon_password' and 'your_minecraft_server_ip' with your actual RCON password and server IP
+            with MCRcon('10.0.0.117', '1234ss') as client:
+                response = client.command(command)
+                print(response)
+        except:
+            print('Command Failed')
+        
+        return response
 
+#playerWhoDied 
 
 
 if __name__ == "__main__":
