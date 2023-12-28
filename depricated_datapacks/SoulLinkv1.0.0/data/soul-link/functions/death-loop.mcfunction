@@ -1,0 +1,2 @@
+execute as @a[scores={deathCount=1..}] unless entity @s[tag=alreadyDead] run schedule function soul-link:death 5t append
+execute as @a[scores={deathCount=1..}] unless entity @s[tag=alreadyDead] run tag @a add alreadyDead

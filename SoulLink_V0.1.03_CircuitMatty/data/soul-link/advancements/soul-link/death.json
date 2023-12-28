@@ -1,0 +1,24 @@
+{
+    "criteria":
+    {
+        "killed_player":
+        {
+            "trigger":"minecraft:player_killed_entity",
+            "conditions":
+            {
+                "entity":
+                {
+                    "type":"minecraft:player"
+                }
+            }
+        }
+    },
+    "requirements":
+    [
+        ["killed_player"]
+    ],
+    "rewards":
+    {
+        "function": "soul-link:pvp_kill"
+    }
+}

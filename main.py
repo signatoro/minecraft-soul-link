@@ -6,6 +6,8 @@ import subprocess
 
 from mcrcon import MCRcon
 
+from constants import DATAPACK_NAME
+
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -19,21 +21,21 @@ class SoulLink():
 
     def start_program(self):   
 
-        self.send_command('/execute if entity @a[tag=playerWhoDied] run tag @p[tag=playerWhoDied] list')
+        # self.send_command('/execute if entity @a[tag=playerWhoDied] run tag @p[tag=playerWhoDied] list')
 
-        # self.server_running = False
+        self.server_running = False
 
-        # self.start_server()
+        self.start_server()
 
-        # while self.running:
+        while self.running:
 
-        #     if self.check_all_player_dead():
-        #         self.stop_server()
-        #         self.move_world()
+            if self.check_all_player_dead():
+                self.stop_server()
+                self.move_world()
 
-        #         self.start_server()
+                self.start_server()
 
-        #     time.sleep(25)
+            time.sleep(25)
 
         return 0
 
@@ -55,18 +57,23 @@ class SoulLink():
             # Check if world has been created
             print("Adding Data Pack")
             if os.path.exists("current_world/world"):
-                while not os.path.exists("current_world/world/datapacks/SoulLink"):
+                while not os.path.exists(f"current_world/world/datapacks/{DATAPACK_NAME}"):
                     if (os.path.exists("current_world/world/datapacks")):
-                        shutil.copytree("SoulLink", "current_world/world/datapacks/SoulLink")
+                        shutil.copytree(DATAPACK_NAME, f"current_world/world/datapacks/{DATAPACK_NAME}")
                         break
                     print ("Waiting...")
                     time.sleep(35)
 
-            # time.sleep(35)
+            time.sleep(15)
             print("Loading Data Pack")
             # docker exec -it minecraft-soul-link_minecraft-server_1 rcon-cli --password 1234ss 'say 1'
-            subprocess.run(['docker', 'exec', '-it', 'minecraft-soul-link_minecraft-server_1', 'rcon-cli', '--password', '1234ss', '/reload'])
-            
+            # subprocess.run(['docker', 'exec', '-it', 'minecraft-soul-link_minecraft-server_1', 'rcon-cli', '--password', '1234ss', '/reload'])
+            # TODO: Add Loop Protection
+            response = self.send_command("/reload")
+
+            while response == 'failed':
+                response = self.send_command("/reload")
+                time.sleep(6)
 
             # Check if the datapack is in the game. 
         else:
@@ -114,7 +121,7 @@ class SoulLink():
 
         response = self.send_command('/execute if entity @a[tag=playerWhoDied] run tag @p[tag=playerWhoDied] list')
         
-        if response:
+        if response and response != 'failed':
             rep_break = response.split(' ')
             print(f"{rep_break.pop(0)} has died!")
             return True
@@ -134,7 +141,8 @@ class SoulLink():
                 response = client.command(command)
                 print(response)
         except:
-            print('Command Failed')
+            print(f'Command Failed {command}')
+            return 'failed'
         
         return response
 
